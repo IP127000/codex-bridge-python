@@ -111,7 +111,34 @@ If you omit the context-window argument, `codex-bridge` first tries any saved
 value for the same model, otherwise falls back to a model-name-based estimate,
 and finally defaults to `128000`.
 
-## CLI Reference
+## Advanced Usage
+
+The simplified launcher is the recommended path, but the original flag-based
+bridge mode is still available and works with the current version.
+
+The two modes use different port behavior:
+
+- Simplified launcher: always uses `127.0.0.1:5057`
+- Advanced standalone bridge mode: `--port` is configurable and still defaults
+  to `4444`
+
+### Start the bridge manually
+
+You can still run `codex-bridge` as a standalone local bridge:
+
+```bash
+codex-bridge --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+```
+
+### Generate a Codex config snippet
+
+The `--print-config` mode is still available:
+
+```bash
+codex-bridge --print-config --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+```
+
+### CLI Reference
 
 | Flag | Env var | Default | Description |
 |---|---|---|---|
@@ -127,7 +154,7 @@ and finally defaults to `128000`.
 | `--history-store` | `CODEX_BRIDGE_HISTORY_STORE` | `memory` | Session backend: `memory` or `disk` |
 | `--history-dir` | `CODEX_BRIDGE_HISTORY_DIR` | `.codex-bridge-history` | Disk history directory when `history-store=disk` |
 
-## Extra Environment Variables
+### Extra Environment Variables
 
 These are supported by the implementation even though they are not exposed as
 CLI flags:
@@ -141,21 +168,6 @@ CLI flags:
 If `CODEX_BRIDGE_FORCE_DEFAULT_MODEL=true`, every incoming request model is
 rewritten to `CODEX_BRIDGE_DEFAULT_MODEL`. When
 `CODEX_BRIDGE_DEFAULT_MODEL` is unset, it defaults to `deepseek-v4-flash`.
-
-## Supported Providers
-
-Any reasonably OpenAI-compatible Chat Completions endpoint should work. Common
-examples:
-
-| Provider | Base URL | Suggested Port |
-|---|---|---|
-| DashScope (Qwen) | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `4448` |
-| DeepSeek | `https://api.deepseek.com/v1` | `4446` |
-| Kimi (Moonshot) | `https://api.moonshot.cn/v1` | `4447` |
-| Mistral | `https://api.mistral.ai/v1` | `4449` |
-| Groq | `https://api.groq.com/openai/v1` | `4450` |
-| xAI | `https://api.x.ai/v1` | `4451` |
-| OpenRouter | `https://openrouter.ai/api/v1` | `4452` |
 
 ## Features
 

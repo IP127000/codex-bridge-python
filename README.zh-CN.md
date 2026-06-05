@@ -104,7 +104,33 @@ codex-bridge
 如果你没有传第 4 个上下文窗口参数，`codex-bridge` 会优先使用当前模型在
 已保存配置中的值；否则按模型名估算；如果仍然没有合适值，就回退到 `128000`。
 
-## CLI 参数
+## Advanced Usage
+
+极简启动是推荐用法，但原来的基于参数开关的 bridge 模式仍然保留，并且可以在
+当前版本继续使用。
+
+这两种模式的端口行为不同：
+
+- 极简启动器：固定使用 `127.0.0.1:5057`
+- 高级独立 bridge 模式：`--port` 仍然可配置，默认值还是 `4444`
+
+### 手动启动 bridge
+
+你仍然可以把 `codex-bridge` 当作独立本地 bridge 启动：
+
+```bash
+codex-bridge --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+```
+
+### 生成 Codex 配置片段
+
+`--print-config` 也仍然可用：
+
+```bash
+codex-bridge --print-config --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+```
+
+### CLI 参数
 
 | 参数 | 环境变量 | 默认值 | 说明 |
 |---|---|---|---|
@@ -120,7 +146,7 @@ codex-bridge
 | `--history-store` | `CODEX_BRIDGE_HISTORY_STORE` | `memory` | 会话后端：`memory` 或 `disk` |
 | `--history-dir` | `CODEX_BRIDGE_HISTORY_DIR` | `.codex-bridge-history` | 当 `history-store=disk` 时使用的目录 |
 
-## 额外环境变量
+### 额外环境变量
 
 这些变量当前实现支持，但没有单独暴露成 CLI 参数：
 
@@ -133,20 +159,6 @@ codex-bridge
 如果开启 `CODEX_BRIDGE_FORCE_DEFAULT_MODEL=true`，所有请求里的 `model`
 都会被统一改写为 `CODEX_BRIDGE_DEFAULT_MODEL`。如果没有显式设置
 `CODEX_BRIDGE_DEFAULT_MODEL`，则默认使用 `deepseek-v4-flash`。
-
-## 支持的上游示例
-
-只要上游足够兼容 OpenAI Chat Completions 接口，通常都可以接入。常见示例：
-
-| 提供商 | Base URL | 建议端口 |
-|---|---|---|
-| DashScope (Qwen) | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `4448` |
-| DeepSeek | `https://api.deepseek.com/v1` | `4446` |
-| Kimi (Moonshot) | `https://api.moonshot.cn/v1` | `4447` |
-| Mistral | `https://api.mistral.ai/v1` | `4449` |
-| Groq | `https://api.groq.com/openai/v1` | `4450` |
-| xAI | `https://api.x.ai/v1` | `4451` |
-| OpenRouter | `https://openrouter.ai/api/v1` | `4452` |
 
 ## 功能说明
 
