@@ -32,60 +32,37 @@ Install from PyPI:
 python3 -m pip install codex-bridge-python
 ```
 
-Install from source:
-
-```bash
-python3 -m pip install .
-```
-
-Build a wheel locally and install it:
-
-```bash
-python3 -m build --wheel
-python3 -m pip install dist/codex_bridge_python-<version>-py3-none-any.whl
-```
-
-Or download a prebuilt wheel from
-[GitHub Releases](https://github.com/IP127000/codex-bridge-python/releases)
-and install it directly:
-
-```bash
-python3 -m pip install /path/to/codex_bridge_python-<version>-py3-none-any.whl
-```
-
-For editable local development:
-
-```bash
-python3 -m pip install -e ".[dev]"
-```
-
 After installation, the `codex-bridge-python` command is available on your `PATH`.
 
 ## Quick Start
 
-`codex-bridge-python` now has one primary launch mode with only positional arguments.
-There are only three practical startup cases:
+The simplest launch form is:
 
-### 3 arguments
+```bash
+codex-bridge-python base_url api_key model
+```
 
-Provide `base_url`, `api_key`, and `model`:
+For example:
 
 ```bash
 codex-bridge-python https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash
 ```
 
-### 4 arguments
+You can also pass a fourth positional argument, `context_size`:
 
-Provide `base_url`, `api_key`, `model`, and `context_size`:
+```bash
+codex-bridge-python base_url api_key model context_size
+```
+
+For example:
 
 ```bash
 codex-bridge-python https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash 262144
 ```
 
-### No arguments
-
-If `~/.codex-bridge-python/config.toml` and `~/.codex-bridge-python/auth.json`
-already exist, you can start again with:
+After the first successful launch, you can run it again without arguments if
+`~/.codex-bridge-python/config.toml` and `~/.codex-bridge-python/auth.json`
+already exist:
 
 ```bash
 codex-bridge-python
@@ -116,6 +93,35 @@ prints exactly which values are missing.
 If you omit the context-window argument, `codex-bridge-python` first tries any saved
 value for the same model, otherwise falls back to a model-name-based estimate,
 and finally defaults to `128000`.
+
+## Development Install
+
+Install from source:
+
+```bash
+python3 -m pip install .
+```
+
+Build a wheel locally and install it:
+
+```bash
+python3 -m build --wheel
+python3 -m pip install dist/codex_bridge_python-<version>-py3-none-any.whl
+```
+
+Or download a prebuilt wheel from
+[GitHub Releases](https://github.com/IP127000/codex-bridge-python/releases)
+and install it directly:
+
+```bash
+python3 -m pip install /path/to/codex_bridge_python-<version>-py3-none-any.whl
+```
+
+For editable local development:
+
+```bash
+python3 -m pip install -e ".[dev]"
+```
 
 ## Advanced Usage
 
