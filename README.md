@@ -14,15 +14,21 @@ the Chat Completions API. `codex-bridge-python` sits between Codex and your upst
 provider, translating requests and responses on the fly so you can keep using
 Codex normally.
 
-## What It Does
+## Features
 
-- Accepts Codex `POST /v1/responses` requests locally
-- Translates them into upstream `POST /v1/chat/completions`
-- Converts blocking and streaming Chat Completions responses back into
-  Responses API format
-- Preserves session history for `previous_response_id`
-- Proxies `/v1/models` and normalizes the response shape for Codex clients
-- Generates a Codex config snippet plus model catalog JSON via `--print-config`
+- **Automatic protocol conversion**: translates Codex's Responses API traffic
+  into upstream Chat Completions requests, then converts blocking and streaming
+  responses back into the Responses API shape Codex expects.
+- **Three-argument Codex launch**: install from PyPI, run
+  `codex-bridge-python base_url api_key model`, and start Codex through the
+  bridge without hand-editing Codex config files.
+- **Context and compression management**: writes Codex model context settings,
+  configures auto-compaction limits, enables request compression, and preserves
+  saved context sizing per model.
+- **Session continuity**: retains history for `previous_response_id` so Codex
+  conversations and tool-call turns can continue across Responses requests.
+- **Model catalog support**: normalizes `/v1/models` responses and maintains a
+  local model catalog so Codex can understand upstream model metadata.
 
 ## Install
 
