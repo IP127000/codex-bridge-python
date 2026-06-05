@@ -8,6 +8,7 @@ import uvicorn
 
 from .app import create_app, log_upstream_models, print_codex_config
 from .config import Settings, configure_logging, parse_args, provider_name_from_upstream
+from .launch import is_simple_launch_args, run_simple_launch
 
 
 async def async_main(settings: Settings) -> int:
@@ -42,7 +43,15 @@ async def async_main(settings: Settings) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
     configure_logging()
+    if is_simple_launch_args(argv):
+        base_url, api_key, model = argv
+        try:
+            return run_simple_launch(base_url, api_key, model)
+        except Exception as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
     try:
         settings = parse_args(argv)
     except Exception as exc:

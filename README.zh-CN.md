@@ -40,6 +40,23 @@ python3 -m pip install -e ".[dev]"
 
 ## 快速开始
 
+### 最简启动方式
+
+如果你想用一条命令直接启动：
+
+```bash
+codex-bridge https://api.deepseek.com/v1 "$DEEPSEEK_API_KEY" deepseek-v4-flash
+```
+
+这个模式会：
+
+- 在 `127.0.0.1:5057` 启动 `codex-bridge`
+- 在当前目录创建临时 `CODEX_HOME`：`./.codex-bridge-home`
+- 自动写入一个指向本地 bridge 的最小 `config.toml`
+- 把第二个参数设置成 `OPENAI_API_KEY`
+- 把第三个参数作为写入 Codex 配置的模型名，同时作为 bridge 强制转发的上游模型
+- 以当前目录为工作区启动 `codex` CLI 子进程
+
 ### 1. 启动 bridge
 
 以 DashScope 为例：
@@ -116,6 +133,9 @@ codex-bridge
 
 如果没有设置 `CODEX_BRIDGE_DEFAULT_MODEL`，bridge 会回退到
 `deepseek-v4-flash`。
+
+三参数极简启动模式会自动把这个强制路由接好，因此不需要额外再做模型映射
+配置。
 
 ## CLI 参数
 

@@ -42,6 +42,24 @@ After installation, the `codex-bridge` command is available on your `PATH`.
 
 ## Quick Start
 
+### Simplest launch
+
+If you want a one-command workflow, run:
+
+```bash
+codex-bridge https://api.deepseek.com/v1 "$DEEPSEEK_API_KEY" deepseek-v4-flash
+```
+
+This mode:
+
+- starts `codex-bridge` on `127.0.0.1:5057`
+- creates a temporary `CODEX_HOME` at `./.codex-bridge-home`
+- writes a minimal `config.toml` that points Codex at the local bridge
+- exports your second argument as `OPENAI_API_KEY`
+- uses your third argument as the model written into Codex config and the
+  bridge's forced upstream model
+- starts the `codex` CLI as a child process in the current directory
+
 ### 1. Start the bridge
 
 Example with DashScope:
@@ -121,6 +139,9 @@ codex-bridge
 
 When `CODEX_BRIDGE_DEFAULT_MODEL` is unset, the bridge falls back to
 `deepseek-v4-flash`.
+
+The simple three-argument launch mode wires this forced routing automatically,
+so Codex can start without extra model mapping steps.
 
 ## CLI Reference
 
