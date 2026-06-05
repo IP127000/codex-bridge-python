@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, PlainTextResponse, Response, StreamingResponse
 
 from .config import Settings
+from .model_catalog import build_model_catalog_entry, build_model_catalog_payload
 from .session import SessionStore
 from .stream import StreamArgs, translate_stream
 from .translate import from_chat_response, to_chat_request
@@ -102,14 +103,33 @@ async def print_codex_config(
         print("// Falling back to a generic snippet. Replace <YOUR_MODEL> below.")
         models = ["<YOUR_MODEL>"]
 
+    catalog_file = f"~/.codex/{provider_name}-model-catalog.json"
+    catalog_entries: list[dict[str, object]] = []
+    for model in models:
+        props = estimate_model_properties(model)
+        catalog_entries.append(
+            build_model_catalog_entry(
+                model=model,
+                description=f"Custom model via codex-bridge upstream: {upstream} -> {model}",
+                context_window=props.context_window,
+                max_context_window=props.max_context_window,
+                supports_parallel_tool_calls=props.supports_parallel_tool_calls,
+                supports_reasoning_summaries=props.supports_reasoning_summaries,
+                input_modalities=["text"],
+            )
+        )
+    catalog_payload = build_model_catalog_payload(catalog_entries)
+
     print(f"# -- Codex config snippet for {urlparse(upstream).hostname or 'custom'} --")
     print("# Copy the lines below into ~/.codex/config.toml")
+    print(f"# Save the JSON block below as {catalog_file}")
     print()
     print(f'model_provider = "{provider_name}"')
     if models and not models[0].startswith("<"):
         print(f'model = "{models[0]}"')
     else:
         print('model = "<CHOOSE_A_MODEL>"')
+    print(f'model_catalog_json = "{catalog_file}"')
     print()
     print(f"[model_providers.{provider_name}]")
     print(f'name = "{provider_name}"')
@@ -117,15 +137,9 @@ async def print_codex_config(
     print('wire_api = "responses"')
     print(f'env_key = "{provider_name.upper().replace("-", "_").replace(".", "_")}_API_KEY"')
     print()
-    for model in models:
-        props = estimate_model_properties(model)
-        print(f'[model_properties."{model}"]')
-        print(f"context_window = {props.context_window}")
-        print(f"max_context_window = {props.max_context_window}")
-        print(f"supports_parallel_tool_calls = {str(props.supports_parallel_tool_calls).lower()}")
-        print(f"supports_reasoning_summaries = {str(props.supports_reasoning_summaries).lower()}")
-        print('input_modalities = ["text"]')
-        print()
+    print("# -- Save as model catalog JSON --")
+    print(json.dumps(catalog_payload, ensure_ascii=False, indent=2))
+    print()
 
 
 def estimate_model_properties(model_id: str) -> ModelProps:

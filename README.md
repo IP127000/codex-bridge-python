@@ -22,7 +22,7 @@ Codex normally.
   Responses API format
 - Preserves session history for `previous_response_id`
 - Proxies `/v1/models` and normalizes the response shape for Codex clients
-- Generates a Codex config snippet with model metadata via `--print-config`
+- Generates a Codex config snippet plus model catalog JSON via `--print-config`
 
 ## Install
 
@@ -47,18 +47,33 @@ After installation, the `codex-bridge` command is available on your `PATH`.
 If you want a one-command workflow, run:
 
 ```bash
-codex-bridge https://api.deepseek.com/v1 "$DEEPSEEK_API_KEY" deepseek-v4-flash
+codex-bridge https://api.deepseek.com/v1 "$DEEPSEEK_API_KEY" deepseek-v4-flash 262144
 ```
 
 This mode:
 
 - starts `codex-bridge` on `127.0.0.1:5057`
-- creates a temporary `CODEX_HOME` at `./.codex-bridge-home`
+- stores bridge state and Codex config in `~/.codex-bridge-python`
 - writes a minimal `config.toml` that points Codex at the local bridge
-- exports your second argument as `OPENAI_API_KEY`
+- saves your second argument into `~/.codex-bridge-python/auth.json` and exports
+  it as `OPENAI_API_KEY`
 - uses your third argument as the model written into Codex config and the
   bridge's forced upstream model
-- starts the `codex` CLI as a child process in the current directory
+- uses your optional fourth argument as the Codex context window size
+- writes `model_context_window`, `model_auto_compact_token_limit`, and enables
+  request compression for Codex
+- starts the `codex` CLI as a child process in the current directory, unless
+  you launch from `~`, in which case it switches the workdir to
+  `~/.codex-bridge-python` to avoid config conflicts with `~/.codex`
+
+If you later rerun `codex-bridge` with missing positional arguments, it will
+try to fill them from `~/.codex-bridge-python/config.toml` and
+`~/.codex-bridge-python/auth.json`. If it
+still cannot resolve all required values, it prints which ones are missing.
+
+If you omit the context-window argument, `codex-bridge` first tries any saved
+value for the same model, otherwise falls back to a model-name-based estimate,
+and finally defaults to `128000`.
 
 ### 1. Start the bridge
 
@@ -96,7 +111,8 @@ This prints a `~/.codex/config.toml` snippet containing:
 
 - a local `base_url` pointing at `http://127.0.0.1:<port>/v1`
 - `wire_api = "responses"`
-- one `model_properties` block per upstream model
+- a `model_catalog_json` entry
+- a JSON model catalog payload for the upstream models
 
 ### 3. Point Codex at the bridge
 
@@ -106,20 +122,19 @@ manual example looks like this:
 ```toml
 model = "qwen-plus"
 model_provider = "dashscope"
+model_catalog_json = "~/.codex/dashscope-model-catalog.json"
 
 [model_providers.dashscope]
 name = "dashscope"
 base_url = "http://127.0.0.1:4448/v1"
 wire_api = "responses"
 env_key = "DASHSCOPE_API_KEY"
-
-[model_properties."qwen-plus"]
-context_window = 131072
-max_context_window = 131072
-supports_parallel_tool_calls = true
-supports_reasoning_summaries = false
-input_modalities = ["text"]
 ```
+
+Then save the matching model catalog JSON at
+`~/.codex/dashscope-model-catalog.json`. The recommended source is the JSON
+payload emitted by `codex-bridge --print-config`, because Codex expects a
+fuller schema than the old `model_properties` blocks.
 
 ### 4. Use Codex normally
 
@@ -140,7 +155,7 @@ codex-bridge
 When `CODEX_BRIDGE_DEFAULT_MODEL` is unset, the bridge falls back to
 `deepseek-v4-flash`.
 
-The simple three-argument launch mode wires this forced routing automatically,
+The simple launch mode wires this forced routing automatically,
 so Codex can start without extra model mapping steps.
 
 ## CLI Reference
@@ -212,8 +227,8 @@ examples:
   consume upstream model lists consistently
 - **Forced default model routing**: Can rewrite every incoming request model to
   a single configured upstream model
-- **Config generation**: Prints Codex-ready `model_properties` blocks from
-  real upstream models
+- **Config generation**: Prints Codex-ready `model_catalog_json` config plus a
+  matching model catalog JSON payload from real upstream models
 
 ## Session Storage
 

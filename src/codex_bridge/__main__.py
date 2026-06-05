@@ -46,9 +46,8 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     configure_logging()
     if is_simple_launch_args(argv):
-        base_url, api_key, model = argv
         try:
-            return run_simple_launch(base_url, api_key, model)
+            return run_simple_launch(argv)
         except Exception as exc:
             print(str(exc), file=sys.stderr)
             return 2

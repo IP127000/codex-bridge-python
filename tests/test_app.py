@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import threading
 from collections import deque
@@ -9,7 +10,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
-from codex_bridge.app import create_app
+from codex_bridge.app import create_app, print_codex_config
 from codex_bridge.config import Settings
 
 
@@ -291,3 +292,14 @@ def test_force_default_model_routes_all_requests_to_default_model() -> None:
                 list(response.iter_lines())
 
         assert upstream.state.bodies[0]["model"] == "deepseek-v4-flash"
+
+
+def test_print_codex_config_outputs_model_catalog_json(capsys) -> None:
+    with MockUpstream() as upstream:
+        asyncio.run(print_codex_config(upstream.base_url, "", "mock", 4444))
+
+    output = capsys.readouterr().out
+    assert 'model_catalog_json = "~/.codex/mock-model-catalog.json"' in output
+    assert '"slug": "mock-model"' in output
+    assert '"base_instructions":' in output
+    assert '[model_properties.' not in output
