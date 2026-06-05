@@ -26,10 +26,25 @@ Codex normally.
 
 ## Install
 
-`codex-bridge` currently lives in this repository. Install it from the checkout:
+Install from source:
 
 ```bash
 python3 -m pip install .
+```
+
+Build a wheel locally and install it:
+
+```bash
+python3 -m build --wheel
+python3 -m pip install dist/codex_bridge-<version>-py3-none-any.whl
+```
+
+Or download a prebuilt wheel from
+[GitHub Releases](https://github.com/IP127000/codex-bridge-python/releases)
+and install it directly:
+
+```bash
+python3 -m pip install /path/to/codex_bridge-<version>-py3-none-any.whl
 ```
 
 For editable local development:
@@ -42,15 +57,38 @@ After installation, the `codex-bridge` command is available on your `PATH`.
 
 ## Quick Start
 
-### Simplest launch
+`codex-bridge` now has one primary launch mode with only positional arguments.
+There are only three practical startup cases:
 
-If you want a one-command workflow, run:
+### 3 arguments
+
+Provide `base_url`, `api_key`, and `model`:
 
 ```bash
-codex-bridge https://api.deepseek.com/v1 "$DEEPSEEK_API_KEY" deepseek-v4-flash 262144
+codex-bridge https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash
 ```
 
-This mode:
+### 4 arguments
+
+Provide `base_url`, `api_key`, `model`, and `context_size`:
+
+```bash
+codex-bridge https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash 262144
+```
+
+### No arguments
+
+If `~/.codex-bridge-python/config.toml` and `~/.codex-bridge-python/auth.json`
+already exist, you can start again with:
+
+```bash
+codex-bridge
+```
+
+If any required value cannot be restored from the saved config, `codex-bridge`
+prints exactly which values are missing.
+
+### What this mode does
 
 - starts `codex-bridge` on `127.0.0.1:5057`
 - stores bridge state and Codex config in `~/.codex-bridge-python`
@@ -65,98 +103,13 @@ This mode:
 - starts the `codex` CLI as a child process in the current directory, unless
   you launch from `~`, in which case it switches the workdir to
   `~/.codex-bridge-python` to avoid config conflicts with `~/.codex`
-
-If you later rerun `codex-bridge` with missing positional arguments, it will
-try to fill them from `~/.codex-bridge-python/config.toml` and
-`~/.codex-bridge-python/auth.json`. If it
-still cannot resolve all required values, it prints which ones are missing.
+- accumulates model metadata in `~/.codex-bridge-python/model-catalog.local.json`
+  and only adds or refreshes the currently selected model entry while keeping
+  existing entries
 
 If you omit the context-window argument, `codex-bridge` first tries any saved
 value for the same model, otherwise falls back to a model-name-based estimate,
 and finally defaults to `128000`.
-
-### 1. Start the bridge
-
-Example with DashScope:
-
-```bash
-CODEX_BRIDGE_UPSTREAM=https://dashscope.aliyuncs.com/compatible-mode/v1 \
-CODEX_BRIDGE_API_KEY=$DASHSCOPE_API_KEY \
-CODEX_BRIDGE_PORT=4448 \
-codex-bridge
-```
-
-Example with DeepSeek:
-
-```bash
-CODEX_BRIDGE_UPSTREAM=https://api.deepseek.com/v1 \
-CODEX_BRIDGE_API_KEY=$DEEPSEEK_API_KEY \
-CODEX_BRIDGE_PORT=4446 \
-codex-bridge
-```
-
-On startup, the bridge fetches upstream models and logs a short summary so you
-can confirm connectivity and available model ids.
-
-### 2. Generate a Codex config snippet
-
-```bash
-codex-bridge --print-config \
-  --port 4448 \
-  --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 \
-  --api-key "$DASHSCOPE_API_KEY"
-```
-
-This prints a `~/.codex/config.toml` snippet containing:
-
-- a local `base_url` pointing at `http://127.0.0.1:<port>/v1`
-- `wire_api = "responses"`
-- a `model_catalog_json` entry
-- a JSON model catalog payload for the upstream models
-
-### 3. Point Codex at the bridge
-
-You can use the printed snippet directly, or configure it manually. A minimal
-manual example looks like this:
-
-```toml
-model = "qwen-plus"
-model_provider = "dashscope"
-model_catalog_json = "~/.codex/dashscope-model-catalog.json"
-
-[model_providers.dashscope]
-name = "dashscope"
-base_url = "http://127.0.0.1:4448/v1"
-wire_api = "responses"
-env_key = "DASHSCOPE_API_KEY"
-```
-
-Then save the matching model catalog JSON at
-`~/.codex/dashscope-model-catalog.json`. The recommended source is the JSON
-payload emitted by `codex-bridge --print-config`, because Codex expects a
-fuller schema than the old `model_properties` blocks.
-
-### 4. Use Codex normally
-
-Once Codex is configured to use the local bridge, requests go through
-`codex-bridge` transparently.
-
-### 5. Force all requests to one upstream model
-
-If you want every incoming request model to be rewritten to a single upstream
-model:
-
-```bash
-CODEX_BRIDGE_FORCE_DEFAULT_MODEL=true \
-CODEX_BRIDGE_DEFAULT_MODEL=deepseek-v4-flash \
-codex-bridge
-```
-
-When `CODEX_BRIDGE_DEFAULT_MODEL` is unset, the bridge falls back to
-`deepseek-v4-flash`.
-
-The simple launch mode wires this forced routing automatically,
-so Codex can start without extra model mapping steps.
 
 ## CLI Reference
 
