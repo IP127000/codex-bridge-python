@@ -143,7 +143,17 @@ def merge_model_catalog_entries(
     current_entry = next((entry for entry in existing_entries if entry.get("slug") == model), None)
     if not current_entry or current_entry.get("context_window") != context_window:
         current_entry = build_model_catalog(base_url, model, context_window)["models"][0]
-    return build_model_catalog_payload([current_entry])
+    merged_entries: list[dict[str, object]] = []
+    replaced = False
+    for entry in existing_entries:
+        if entry.get("slug") == model:
+            merged_entries.append(current_entry)
+            replaced = True
+        else:
+            merged_entries.append(entry)
+    if not replaced:
+        merged_entries.append(current_entry)
+    return build_model_catalog_payload(merged_entries)
 
 
 def write_model_catalog(

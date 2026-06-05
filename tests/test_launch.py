@@ -139,9 +139,10 @@ def test_prepare_temp_codex_home_reuses_existing_selected_model_metadata(tmp_pat
         reset=False,
     )
     catalog = json.loads((home_dir / MODEL_CATALOG_NAME).read_text(encoding="utf-8"))
-    assert len(catalog["models"]) == 1
-    assert catalog["models"][0]["slug"] == "deepseek-v4-flash"
-    assert catalog["models"][0]["display_name"] == "cached-deepseek"
+    models = {item["slug"]: item for item in catalog["models"]}
+    assert set(models) == {"deepseek-v4-flash", "qwen-plus"}
+    assert models["deepseek-v4-flash"]["display_name"] == "cached-deepseek"
+    assert models["qwen-plus"]["description"] == "cached-qwen"
 
 
 def test_prepare_temp_codex_home_writes_config(tmp_path: Path) -> None:
