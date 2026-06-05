@@ -94,6 +94,8 @@ def make_settings(upstream: str) -> Settings:
         upstream=upstream,
         api_key="",
         print_config=False,
+        force_default_model=False,
+        default_model="deepseek-v4-flash",
         max_sessions=256,
         max_session_memory_mb=512,
         session_ttl_hours=168,
@@ -266,3 +268,26 @@ def test_spawn_agent_child_context_does_not_replay_parent_history() -> None:
             for message in child_messages
         )
         assert [message["content"] for message in child_messages if message["role"] == "user"] == [child_task]
+
+
+def test_force_default_model_routes_all_requests_to_default_model() -> None:
+    with MockUpstream() as upstream:
+        settings = make_settings(upstream.base_url)
+        settings.force_default_model = True
+        settings.default_model = "deepseek-v4-flash"
+        app = create_app(settings)
+        with TestClient(app) as client:
+            with client.stream(
+                "POST",
+                "/v1/responses",
+                json={
+                    "model": "gpt-5.4",
+                    "input": "Say OK.",
+                    "tools": [],
+                    "stream": True,
+                },
+            ) as response:
+                assert response.status_code == 200
+                list(response.iter_lines())
+
+        assert upstream.state.bodies[0]["model"] == "deepseek-v4-flash"

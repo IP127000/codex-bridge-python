@@ -113,6 +113,30 @@ def test_model_map_env_is_honored(monkeypatch) -> None:
     assert chat.model == "deepseek-v4-pro"
 
 
+def test_force_default_model_overrides_request_model() -> None:
+    req = ResponsesRequest.from_dict({"model": "gpt-5.4", "input": "hi"})
+    chat = to_chat_request(
+        req,
+        [],
+        SessionStore(),
+        force_default_model=True,
+        default_model="deepseek-v4-flash",
+    )
+    assert chat.model == "deepseek-v4-flash"
+
+
+def test_force_default_model_uses_fallback_when_default_is_empty() -> None:
+    req = ResponsesRequest.from_dict({"model": "gpt-5.4", "input": "hi"})
+    chat = to_chat_request(
+        req,
+        [],
+        SessionStore(),
+        force_default_model=True,
+        default_model="",
+    )
+    assert chat.model == "deepseek-v4-flash"
+
+
 def test_history_deduplicates_replayed_function_call_output() -> None:
     history = [
         ChatMessage(

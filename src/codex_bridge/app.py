@@ -36,6 +36,8 @@ class AppState:
     client: httpx.AsyncClient
     upstream: str
     api_key: str
+    force_default_model: bool
+    default_model: str
 
 
 def join_base(url: str) -> str:
@@ -278,6 +280,8 @@ def create_app(settings: Settings) -> FastAPI:
         client=httpx.AsyncClient(timeout=None),
         upstream=settings.upstream,
         api_key=settings.api_key,
+        force_default_model=settings.force_default_model,
+        default_model=settings.default_model,
     )
 
     @asynccontextmanager
@@ -291,6 +295,11 @@ def create_app(settings: Settings) -> FastAPI:
             settings.session_ttl_hours,
             settings.max_sessions,
             settings.max_session_memory_mb,
+        )
+        logger.info(
+            "model routing: force_default_model=%s default_model=%s",
+            settings.force_default_model,
+            settings.default_model,
         )
         logger.info("codex-bridge listening on 127.0.0.1:%s -> %s", settings.port, settings.upstream)
         try:
@@ -369,7 +378,13 @@ async def handle_responses_inner(state: AppState, req: ResponsesRequest) -> Resp
         history = []
 
     model = req.model
-    chat_req = to_chat_request(req, history, state.sessions)
+    chat_req = to_chat_request(
+        req,
+        history,
+        state.sessions,
+        force_default_model=state.force_default_model,
+        default_model=state.default_model,
+    )
     logger.debug("-> upstream tools=%s", summarize_debug_names(chat_tool_debug_names(chat_req.tools)))
     url = f"{join_base(state.upstream)}chat/completions"
 

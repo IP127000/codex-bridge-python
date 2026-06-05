@@ -41,6 +41,8 @@ class Settings:
     upstream: str
     api_key: str
     print_config: bool
+    force_default_model: bool
+    default_model: str
     max_sessions: int
     max_session_memory_mb: int
     session_ttl_hours: int
@@ -112,6 +114,15 @@ def parse_args(argv: list[str] | None = None) -> Settings:
     )
     parser.add_argument("--print-config", action="store_true")
     parser.add_argument(
+        "--force-default-model",
+        action="store_true",
+        default=env_bool("CODEX_BRIDGE_FORCE_DEFAULT_MODEL", default=False),
+    )
+    parser.add_argument(
+        "--default-model",
+        default=env_value("CODEX_BRIDGE_DEFAULT_MODEL", default="deepseek-v4-flash"),
+    )
+    parser.add_argument(
         "--max-sessions",
         type=int,
         default=env_int(
@@ -158,6 +169,8 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         upstream=validate_upstream(args.upstream),
         api_key=args.api_key,
         print_config=args.print_config,
+        force_default_model=args.force_default_model,
+        default_model=args.default_model.strip() or "deepseek-v4-flash",
         max_sessions=max(args.max_sessions, 1),
         max_session_memory_mb=max(args.max_session_memory_mb, 1),
         session_ttl_hours=max(args.session_ttl_hours, 1),

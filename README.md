@@ -108,6 +108,20 @@ input_modalities = ["text"]
 Once Codex is configured to use the local bridge, requests go through
 `codex-bridge` transparently.
 
+### 5. Force all requests to one upstream model
+
+If you want every incoming request model to be rewritten to a single upstream
+model:
+
+```bash
+CODEX_BRIDGE_FORCE_DEFAULT_MODEL=true \
+CODEX_BRIDGE_DEFAULT_MODEL=deepseek-v4-flash \
+codex-bridge
+```
+
+When `CODEX_BRIDGE_DEFAULT_MODEL` is unset, the bridge falls back to
+`deepseek-v4-flash`.
+
 ## CLI Reference
 
 | Flag | Env var | Default | Description |
@@ -116,6 +130,8 @@ Once Codex is configured to use the local bridge, requests go through
 | `--upstream` | `CODEX_BRIDGE_UPSTREAM` | `https://openrouter.ai/api/v1` | Upstream Chat Completions base URL |
 | `--api-key` | `CODEX_BRIDGE_API_KEY` | _(empty)_ | API key forwarded to upstream |
 | `--print-config` | _(none)_ | — | Print a Codex config snippet and exit |
+| `--force-default-model` | `CODEX_BRIDGE_FORCE_DEFAULT_MODEL` | `false` | Ignore the incoming request model and always forward the default model |
+| `--default-model` | `CODEX_BRIDGE_DEFAULT_MODEL` | `deepseek-v4-flash` | Target model used when forced default model routing is enabled |
 | `--max-sessions` | `CODEX_BRIDGE_MAX_SESSIONS` | `256` | Maximum retained completed sessions |
 | `--max-session-memory-mb` | `CODEX_BRIDGE_MAX_SESSION_MEMORY_MB` | `512` | Approximate memory budget for retained session and reasoning state |
 | `--session-ttl-hours` | `CODEX_BRIDGE_SESSION_TTL_HOURS` | `168` | Idle session retention window in hours |
@@ -132,6 +148,10 @@ CLI flags:
 | `CODEX_BRIDGE_MODEL_MAP` | _(empty)_ | Comma-separated model remaps such as `gpt-5.4:qwen-plus` |
 | `CODEX_BRIDGE_TOOL_DENYLIST` | _(empty)_ | Comma-separated tool names to drop before forwarding upstream |
 | `CODEX_BRIDGE_LOG` | `codex_bridge=info` | Logging level hint, for example `debug`, `info`, `warning`, `error` |
+
+If `CODEX_BRIDGE_FORCE_DEFAULT_MODEL=true`, every incoming request model is
+rewritten to `CODEX_BRIDGE_DEFAULT_MODEL`. When
+`CODEX_BRIDGE_DEFAULT_MODEL` is unset, it defaults to `deepseek-v4-flash`.
 
 ## Supported Providers
 
@@ -169,6 +189,8 @@ examples:
   accidentally replaying parent history
 - **Model catalog proxying**: Normalizes `/v1/models` so Codex clients can
   consume upstream model lists consistently
+- **Forced default model routing**: Can rewrite every incoming request model to
+  a single configured upstream model
 - **Config generation**: Prints Codex-ready `model_properties` blocks from
   real upstream models
 

@@ -22,6 +22,9 @@ def to_chat_request(
     req: ResponsesRequest,
     history: list[ChatMessage],
     sessions: SessionStore,
+    *,
+    force_default_model: bool = False,
+    default_model: str = "deepseek-v4-flash",
 ) -> ChatRequest:
     messages = list(history)
 
@@ -125,7 +128,11 @@ def to_chat_request(
             index += 1
 
     return ChatRequest(
-        model=map_model_name(req.model),
+        model=map_model_name(
+            req.model,
+            force_default_model=force_default_model,
+            default_model=default_model,
+        ),
         messages=messages,
         tools=convert_tools(req.tools),
         temperature=req.temperature,
@@ -135,7 +142,15 @@ def to_chat_request(
     )
 
 
-def map_model_name(name: str) -> str:
+def map_model_name(
+    name: str,
+    *,
+    force_default_model: bool = False,
+    default_model: str = "deepseek-v4-flash",
+) -> str:
+    effective_default_model = default_model.strip() or "deepseek-v4-flash"
+    if force_default_model:
+        return effective_default_model
     mapping = env_value("CODEX_BRIDGE_MODEL_MAP", default="")
     for pair in mapping.split(","):
         if ":" not in pair:
