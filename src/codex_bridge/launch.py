@@ -19,9 +19,9 @@ from .runner import _find_binary
 
 SIMPLE_LAUNCH_PORT = 5057
 CODEX_BRIDGE_HOME_NAME = ".codex-bridge-python"
-LOCAL_PROVIDER_NAME = "codex-bridge"
+LOCAL_PROVIDER_NAME = "codex-bridge-python"
 LOCAL_BRIDGE_URL = f"http://127.0.0.1:{SIMPLE_LAUNCH_PORT}/v1"
-BRIDGE_LOG_NAME = "codex-bridge.log"
+BRIDGE_LOG_NAME = "codex-bridge-python.log"
 LAUNCHER_SECTION_NAME = "codex_bridge_launcher"
 DEFAULT_CONTEXT_WINDOW = 128_000
 MODEL_CATALOG_NAME = "model-catalog.local.json"
@@ -104,7 +104,7 @@ def build_model_catalog(
 ) -> dict[str, list[dict[str, object]]]:
     provider_url = validate_upstream(base_url)
     props = estimate_model_properties(model)
-    description = f"Custom model via codex-bridge upstream: {provider_url} -> {model}"
+    description = f"Custom model via codex-bridge-python upstream: {provider_url} -> {model}"
     return build_model_catalog_payload(
         [
             build_model_catalog_entry(
@@ -399,7 +399,7 @@ def wait_for_bridge_ready(process: subprocess.Popen[bytes], log_path: Path, time
     while time.time() < deadline:
         if process.poll() is not None:
             details = _tail_log(log_path)
-            raise RuntimeError(f"codex-bridge exited before becoming ready\n{details}".rstrip())
+            raise RuntimeError(f"codex-bridge-python exited before becoming ready\n{details}".rstrip())
         try:
             response = httpx.get(f"{LOCAL_BRIDGE_URL}/models", timeout=1.0)
             if response.status_code == 200:
@@ -409,7 +409,7 @@ def wait_for_bridge_ready(process: subprocess.Popen[bytes], log_path: Path, time
             last_error = str(exc)
         time.sleep(0.25)
     details = _tail_log(log_path)
-    raise RuntimeError(f"timed out waiting for codex-bridge ({last_error})\n{details}".rstrip())
+    raise RuntimeError(f"timed out waiting for codex-bridge-python ({last_error})\n{details}".rstrip())
 
 
 def run_simple_launch(
@@ -437,9 +437,9 @@ def run_simple_launch(
         env["CODEX_HOME"] = str(home_dir)
         env["OPENAI_API_KEY"] = api_key
         cmd = [*_find_codex_binary(), *_codex_config_overrides(model, context_window, model_catalog_path(home_dir))]
-        print(f"codex-bridge: upstream={base_url} local={LOCAL_BRIDGE_URL} model={model}", file=sys.stderr)
-        print(f"codex-bridge: CODEX_HOME={home_dir}", file=sys.stderr)
-        print(f"codex-bridge: workdir={launch_workdir} context_window={context_window}", file=sys.stderr)
+        print(f"codex-bridge-python: upstream={base_url} local={LOCAL_BRIDGE_URL} model={model}", file=sys.stderr)
+        print(f"codex-bridge-python: CODEX_HOME={home_dir}", file=sys.stderr)
+        print(f"codex-bridge-python: workdir={launch_workdir} context_window={context_window}", file=sys.stderr)
         process = subprocess.Popen(
             cmd,
             env=env,

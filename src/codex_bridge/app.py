@@ -84,7 +84,7 @@ async def log_upstream_models(upstream: str, api_key: str) -> None:
     if models:
         logger.info("upstream models: %s", ", ".join(models))
         logger.info(
-            "To configure Codex with model metadata, run: codex-bridge --print-config --upstream %s %s",
+            "To configure Codex with model metadata, run: codex-bridge-python --print-config --upstream %s %s",
             upstream,
             "" if not api_key else "--api-key ...",
         )
@@ -110,7 +110,7 @@ async def print_codex_config(
         catalog_entries.append(
             build_model_catalog_entry(
                 model=model,
-                description=f"Custom model via codex-bridge upstream: {upstream} -> {model}",
+                description=f"Custom model via codex-bridge-python upstream: {upstream} -> {model}",
                 context_window=props.context_window,
                 max_context_window=props.max_context_window,
                 supports_parallel_tool_calls=props.supports_parallel_tool_calls,
@@ -315,7 +315,7 @@ def create_app(settings: Settings) -> FastAPI:
             settings.force_default_model,
             settings.default_model,
         )
-        logger.info("codex-bridge listening on 127.0.0.1:%s -> %s", settings.port, settings.upstream)
+        logger.info("codex-bridge-python listening on 127.0.0.1:%s -> %s", settings.port, settings.upstream)
         try:
             yield
         finally:

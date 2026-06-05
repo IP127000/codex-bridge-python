@@ -93,7 +93,7 @@ def configure_logging() -> None:
 
 def parse_args(argv: list[str] | None = None) -> Settings:
     parser = argparse.ArgumentParser(
-        prog="codex-bridge",
+        prog="codex-bridge-python",
         description="Responses API ↔ Chat Completions bridge",
     )
     parser.add_argument(
@@ -159,7 +159,7 @@ def parse_args(argv: list[str] | None = None) -> Settings:
         default=Path(
             env_value(
                 "CODEX_BRIDGE_HISTORY_DIR",
-                default=".codex-bridge-history",
+                default=".codex-bridge-python-history",
             )
         ),
     )

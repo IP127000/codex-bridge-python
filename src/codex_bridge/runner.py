@@ -8,10 +8,10 @@ from pathlib import Path
 
 
 def _find_binary() -> list[str]:
-    script = shutil.which("codex-bridge")
+    script = shutil.which("codex-bridge-python")
     if script:
         return [script]
-    local = Path(__file__).resolve().parents[2] / "bin" / "codex-bridge"
+    local = Path(__file__).resolve().parents[2] / "bin" / "codex-bridge-python"
     if local.exists():
         return [str(local)]
     return [sys.executable, "-m", "codex_bridge"]

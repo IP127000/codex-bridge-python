@@ -1,4 +1,4 @@
-# codex-bridge
+# codex-bridge-python
 
 [English](./README.md) | [简体中文](./README.zh-CN.md)
 
@@ -10,7 +10,7 @@ OpenRouter, Groq, xAI, and others.
 ## Why
 
 Codex speaks the OpenAI Responses API. Many non-OpenAI providers expose only
-the Chat Completions API. `codex-bridge` sits between Codex and your upstream
+the Chat Completions API. `codex-bridge-python` sits between Codex and your upstream
 provider, translating requests and responses on the fly so you can keep using
 Codex normally.
 
@@ -26,6 +26,12 @@ Codex normally.
 
 ## Install
 
+Install from PyPI:
+
+```bash
+python3 -m pip install codex-bridge-python
+```
+
 Install from source:
 
 ```bash
@@ -36,7 +42,7 @@ Build a wheel locally and install it:
 
 ```bash
 python3 -m build --wheel
-python3 -m pip install dist/codex_bridge-<version>-py3-none-any.whl
+python3 -m pip install dist/codex_bridge_python-<version>-py3-none-any.whl
 ```
 
 Or download a prebuilt wheel from
@@ -44,7 +50,7 @@ Or download a prebuilt wheel from
 and install it directly:
 
 ```bash
-python3 -m pip install /path/to/codex_bridge-<version>-py3-none-any.whl
+python3 -m pip install /path/to/codex_bridge_python-<version>-py3-none-any.whl
 ```
 
 For editable local development:
@@ -53,11 +59,11 @@ For editable local development:
 python3 -m pip install -e ".[dev]"
 ```
 
-After installation, the `codex-bridge` command is available on your `PATH`.
+After installation, the `codex-bridge-python` command is available on your `PATH`.
 
 ## Quick Start
 
-`codex-bridge` now has one primary launch mode with only positional arguments.
+`codex-bridge-python` now has one primary launch mode with only positional arguments.
 There are only three practical startup cases:
 
 ### 3 arguments
@@ -65,7 +71,7 @@ There are only three practical startup cases:
 Provide `base_url`, `api_key`, and `model`:
 
 ```bash
-codex-bridge https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash
+codex-bridge-python https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash
 ```
 
 ### 4 arguments
@@ -73,7 +79,7 @@ codex-bridge https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-
 Provide `base_url`, `api_key`, `model`, and `context_size`:
 
 ```bash
-codex-bridge https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash 262144
+codex-bridge-python https://dashscope.aliyuncs.com/compatible-mode/v1 sk-xxxx deepseek-v4-flash 262144
 ```
 
 ### No arguments
@@ -82,15 +88,15 @@ If `~/.codex-bridge-python/config.toml` and `~/.codex-bridge-python/auth.json`
 already exist, you can start again with:
 
 ```bash
-codex-bridge
+codex-bridge-python
 ```
 
-If any required value cannot be restored from the saved config, `codex-bridge`
+If any required value cannot be restored from the saved config, `codex-bridge-python`
 prints exactly which values are missing.
 
 ### What this mode does
 
-- starts `codex-bridge` on `127.0.0.1:5057`
+- starts `codex-bridge-python` on `127.0.0.1:5057`
 - stores bridge state and Codex config in `~/.codex-bridge-python`
 - writes a minimal `config.toml` that points Codex at the local bridge
 - saves your second argument into `~/.codex-bridge-python/auth.json` and exports
@@ -107,7 +113,7 @@ prints exactly which values are missing.
   and only adds or refreshes the currently selected model entry while keeping
   existing entries
 
-If you omit the context-window argument, `codex-bridge` first tries any saved
+If you omit the context-window argument, `codex-bridge-python` first tries any saved
 value for the same model, otherwise falls back to a model-name-based estimate,
 and finally defaults to `128000`.
 
@@ -124,10 +130,10 @@ The two modes use different port behavior:
 
 ### Start the bridge manually
 
-You can still run `codex-bridge` as a standalone local bridge:
+You can still run `codex-bridge-python` as a standalone local bridge:
 
 ```bash
-codex-bridge --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+codex-bridge-python --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
 ```
 
 ### Generate a Codex config snippet
@@ -135,7 +141,7 @@ codex-bridge --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-
 The `--print-config` mode is still available:
 
 ```bash
-codex-bridge --print-config --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
+codex-bridge-python --print-config --upstream https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxxx --port 4448
 ```
 
 ### CLI Reference
@@ -152,7 +158,7 @@ codex-bridge --print-config --upstream https://dashscope.aliyuncs.com/compatible
 | `--max-session-memory-mb` | `CODEX_BRIDGE_MAX_SESSION_MEMORY_MB` | `512` | Approximate memory budget for retained session and reasoning state |
 | `--session-ttl-hours` | `CODEX_BRIDGE_SESSION_TTL_HOURS` | `168` | Idle session retention window in hours |
 | `--history-store` | `CODEX_BRIDGE_HISTORY_STORE` | `memory` | Session backend: `memory` or `disk` |
-| `--history-dir` | `CODEX_BRIDGE_HISTORY_DIR` | `.codex-bridge-history` | Disk history directory when `history-store=disk` |
+| `--history-dir` | `CODEX_BRIDGE_HISTORY_DIR` | `.codex-bridge-python-history` | Disk history directory when `history-store=disk` |
 
 ### Extra Environment Variables
 
@@ -197,21 +203,21 @@ rewritten to `CODEX_BRIDGE_DEFAULT_MODEL`. When
 
 ## Session Storage
 
-By default, `codex-bridge` keeps retained session and reasoning state in
+By default, `codex-bridge-python` keeps retained session and reasoning state in
 memory.
 
 To use disk-backed retention:
 
 ```bash
 CODEX_BRIDGE_HISTORY_STORE=disk \
-CODEX_BRIDGE_HISTORY_DIR=.codex-bridge-history \
-codex-bridge
+CODEX_BRIDGE_HISTORY_DIR=.codex-bridge-python-history \
+codex-bridge-python
 ```
 
 The disk backend writes JSON files under:
 
 ```text
-.codex-bridge-history/
+.codex-bridge-python-history/
   sessions/
   reasoning/
   turns/
@@ -261,7 +267,7 @@ The current tests cover:
 For more verbose bridge logs:
 
 ```bash
-CODEX_BRIDGE_LOG=debug codex-bridge
+CODEX_BRIDGE_LOG=debug codex-bridge-python
 ```
 
 Useful things to look for in logs:
@@ -273,7 +279,7 @@ Useful things to look for in logs:
 
 ## Known Scope
 
-`codex-bridge` is focused on Codex's Responses workflow and currently proxies:
+`codex-bridge-python` is focused on Codex's Responses workflow and currently proxies:
 
 - `POST /v1/responses`
 - `GET /v1/models`
