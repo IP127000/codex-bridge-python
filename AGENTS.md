@@ -53,14 +53,20 @@ python3 -m pytest -q
 3. Run local validation.
 
 ```bash
+scripts/check.sh
+```
+
+Or run the commands manually:
+
+```bash
 python3 -m pytest -q
 rm -rf /tmp/codex-bridge-python-dist-X.Y.Z
 python3 -m build --sdist --wheel --outdir /tmp/codex-bridge-python-dist-X.Y.Z
 python3 -m twine check /tmp/codex-bridge-python-dist-X.Y.Z/*
 ```
 
-If `twine` is not installed locally, install the dev extra or use a temporary
-virtual environment:
+If `build` or `twine` is not installed locally, install the dev extra or use a
+temporary virtual environment:
 
 ```bash
 python3 -m pip install -e ".[dev]"
@@ -144,6 +150,58 @@ gh release view vX.Y.Z --repo IP127000/codex-bridge-python --json url,tagName,as
 
 For README-only PyPI changes, verify the PyPI JSON description contains the new
 phrasing. The browser page may take longer to refresh.
+
+## Testing Guide
+
+Always run the complete test suite before committing behavior changes:
+
+```bash
+python3 -m pytest -q
+```
+
+For release readiness, prefer the project check script:
+
+```bash
+scripts/check.sh
+```
+
+The script reads the version from `pyproject.toml`, runs tests, builds sdist and
+wheel into `/tmp/codex-bridge-python-dist-X.Y.Z`, and runs `twine check` on the
+artifacts. It installs the dev extra if `build` or `twine` is missing, cleans
+the generated `src/codex_bridge_python.egg-info`, and does not publish anything.
+
+Current test areas:
+
+- `tests/test_translate.py`: Responses-to-Chat-Completions translation,
+  namespace tool flattening, reasoning item handling, image input conversion,
+  model mapping, forced default model routing, denylisted tools, and history
+  deduplication.
+- `tests/test_app.py`: FastAPI bridge behavior against a mock upstream,
+  streaming SSE conversion, usage propagation, namespace tool-call round trip,
+  spawned child isolation, forced model routing, and config/model catalog
+  output.
+- `tests/test_launch.py`: simplified launcher argument detection, persisted
+  launcher config, auth JSON, model catalog merging, context window defaults,
+  auto-compaction settings, request compression settings, and launch workdir
+  handling.
+
+When changing a code path, add or update tests in the matching area:
+
+- Translation or request/response schema changes: update `tests/test_translate.py`
+  and add fixtures under `tests/fixtures/` when real Codex payload shape matters.
+- Streaming behavior or HTTP proxy behavior: update `tests/test_app.py` with
+  mock upstream SSE chunks and assert both downstream Responses events and
+  upstream Chat Completions request bodies.
+- Simple launcher, context size, Codex config, auth, or model catalog changes:
+  update `tests/test_launch.py`.
+- Session retention, disk history, reasoning carry-over, or cleanup changes:
+  add focused tests for `SessionStore` behavior. If no suitable file exists,
+  create a new `tests/test_session.py`.
+- CLI parsing or environment variable behavior: add focused tests for
+  `parse_args` or the affected helper.
+
+Before releasing, make sure tests cover both the user-visible outcome and the
+internal upstream request shape when the bridge transforms data.
 
 ## Documentation-Only Repository Changes
 
