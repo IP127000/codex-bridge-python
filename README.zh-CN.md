@@ -8,6 +8,14 @@
 DashScope（Qwen）、DeepSeek、Kimi、OpenRouter、Groq、xAI 等
 OpenAI 兼容上游。
 
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/IP127000/codex-bridge-python/main/docs/images/readme-hero-zh-cn.png"
+    alt="codex-bridge-python 中文概览图"
+    width="860"
+  />
+</p>
+
 ## 用途
 
 Codex 本身使用的是 OpenAI 的 Responses API，而很多非 OpenAI 提供商只

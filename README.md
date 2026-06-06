@@ -8,6 +8,14 @@ Codex into the standard **Chat Completions API**, so Codex can work with
 OpenAI-compatible providers such as DashScope (Qwen), DeepSeek, Kimi,
 OpenRouter, Groq, xAI, and others.
 
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/IP127000/codex-bridge-python/main/docs/images/readme-hero-en.png"
+    alt="codex-bridge-python overview"
+    width="860"
+  />
+</p>
+
 ## Why
 
 Codex speaks the OpenAI Responses API. Many non-OpenAI providers expose only

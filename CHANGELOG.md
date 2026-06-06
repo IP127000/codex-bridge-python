@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-06-06
+
+### Changed
+
+- Added scaled English and Simplified Chinese overview images to the README so
+  GitHub and PyPI render the project introduction more clearly.
+
 ## [0.1.4] - 2026-06-06
 
 ### Changed
