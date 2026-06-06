@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-06-06
+
+### Changed
+
+- Changed README language-switch links to absolute GitHub URLs so they work
+  from the PyPI project page.
+
 ## [0.1.3] - 2026-06-06
 
 ### Changed

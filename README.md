@@ -1,6 +1,7 @@
 # codex-bridge-python
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+[English](https://github.com/IP127000/codex-bridge-python/blob/main/README.md) |
+[简体中文](https://github.com/IP127000/codex-bridge-python/blob/main/README.zh-CN.md)
 
 A lightweight Python proxy that translates the OpenAI **Responses API** used by
 Codex into the standard **Chat Completions API**, so Codex can work with

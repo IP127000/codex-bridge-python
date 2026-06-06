@@ -1,6 +1,7 @@
 # codex-bridge-python
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+[English](https://github.com/IP127000/codex-bridge-python/blob/main/README.md) |
+[简体中文](https://github.com/IP127000/codex-bridge-python/blob/main/README.zh-CN.md)
 
 一个轻量级 Python 代理，用来把 Codex 使用的 OpenAI **Responses API**
 实时转换成标准 **Chat Completions API**，从而让 Codex 可以接入
