@@ -30,6 +30,13 @@ git tag -a v0.1.0 -m "Release v0.1.0"
 git push origin v0.1.0
 ```
 
-4. The `Release` GitHub Actions workflow builds, checks, and publishes the package through PyPI Trusted Publishing.
+4. The `Release` GitHub Actions workflow builds, checks, and publishes the package to PyPI.
 
-Configure PyPI Trusted Publishing for repository `IP127000/codex-bridge-python`, workflow `.github/workflows/release.yml`, environment `pypi`, and project `codex-bridge-python`.
+The current workflow publishes with the GitHub Actions secret `PYPI_API_TOKEN`.
+If PyPI Trusted Publishing is configured later for repository
+`IP127000/codex-bridge-python`, workflow `.github/workflows/release.yml`,
+environment `pypi`, and project `codex-bridge-python`, remove the explicit
+`password: ${{ secrets.PYPI_API_TOKEN }}` setting from the publish step.
+
+See `AGENTS.md` for the full automation-agent release checklist, including
+GitHub Release creation and release note guidance.
