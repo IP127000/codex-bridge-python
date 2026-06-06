@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-06-06
+
+### Changed
+
+- Clarified that development/source installs should start by cloning the GitHub
+  repository and changing into the project directory.
+
 ## [0.1.2] - 2026-06-06
 
 ### Changed

@@ -94,7 +94,14 @@ codex-bridge-python
 
 ## 开发安装
 
-也可以直接从源码安装：
+先克隆 GitHub 仓库：
+
+```bash
+git clone https://github.com/IP127000/codex-bridge-python.git
+cd codex-bridge-python
+```
+
+然后从源码安装：
 
 ```bash
 python3 -m pip install .
@@ -115,7 +122,7 @@ python3 -m pip install dist/codex_bridge_python-<version>-py3-none-any.whl
 python3 -m pip install /path/to/codex_bridge_python-<version>-py3-none-any.whl
 ```
 
-如果你要本地开发并安装测试依赖：
+如果你要本地开发，并安装测试和发布相关依赖：
 
 ```bash
 python3 -m pip install -e ".[dev]"

@@ -102,7 +102,14 @@ and finally defaults to `128000`.
 
 ## Development Install
 
-Install from source:
+Clone the repository first:
+
+```bash
+git clone https://github.com/IP127000/codex-bridge-python.git
+cd codex-bridge-python
+```
+
+Then install from source:
 
 ```bash
 python3 -m pip install .
@@ -123,7 +130,7 @@ and install it directly:
 python3 -m pip install /path/to/codex_bridge_python-<version>-py3-none-any.whl
 ```
 
-For editable local development:
+For editable local development with test and release tooling:
 
 ```bash
 python3 -m pip install -e ".[dev]"
